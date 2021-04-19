@@ -16,7 +16,7 @@ run-tests:
   stage: tests
   script:
     - pip3 install -r requirements.txt && pip3 install -r requirements_dev.txt
-    - pytest
+    - cd tests && pytest
 
 build-docker-gitlab:
   stage: docker
