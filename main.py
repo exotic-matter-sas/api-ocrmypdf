@@ -4,7 +4,7 @@ import secrets
 import subprocess
 import uuid
 from datetime import datetime, timedelta
-from pathlib import Path, PurePosixPath
+from pathlib import Path
 from threading import BoundedSemaphore
 from typing import Optional, List, Dict
 from uuid import UUID
@@ -118,14 +118,14 @@ def status():
 
 
 @app.get("/ocr/{pid}", response_model=Document)
-def doc(pid: UUID, api_key: APIKey = Depends(check_api_key)):
+def get_doc_detail(pid: UUID, api_key: APIKey = Depends(check_api_key)):
     if pid in documents:
         return documents[pid]
     raise HTTPException(status_code=404)
 
 
 @app.get("/ocr/{pid}/pdf")
-def get_doc_output(pid: UUID, api_key: APIKey = Depends(check_api_key)):
+def get_doc_pdf(pid: UUID, api_key: APIKey = Depends(check_api_key)):
     if pid in documents:
         output_doc = documents[pid].output
 
@@ -140,7 +140,7 @@ def get_doc_output(pid: UUID, api_key: APIKey = Depends(check_api_key)):
 
 
 @app.get("/ocr/{pid}/txt")
-def get_doc_output(pid: UUID, api_key: APIKey = Depends(check_api_key)):
+def get_doc_txt(pid: UUID, api_key: APIKey = Depends(check_api_key)):
     if pid in documents:
         output_doc_txt = documents[pid].output_txt
 
@@ -168,7 +168,7 @@ async def ocr(
     expire = now + expiration_delta
     filename = f"{pid}_{int(expire.timestamp())}"
 
-    input_file = workdir / PurePosixPath(f"i_{filename}.pdf")
+    input_file = workdir / Path(f"i_{filename}.pdf")
     save_upload_file(file, input_file)
     output_file = workdir / Path(f"o_{filename}.pdf")
     output_file_json = workdir / Path(f"o_{filename}.json")
@@ -186,6 +186,7 @@ async def ocr(
             "expire": expire,
         }
     )
+    documents[pid].save_state()
 
     background_tasks.add_task(do_ocr, documents[pid])
 
