@@ -8,11 +8,19 @@ services:
   - docker:dind
 
 stages:
+  - tests
   - docker
 
+run-tests:
+  image: python:3.7-slim
+  stage: tests
+  script:
+    - pip3 install -r requirements.txt && pip3 install -r requirements_dev.txt
+    - pytest
 
 build-docker-gitlab:
   stage: docker
+  needs: [ ]
   script:
     - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_NAME .
