@@ -26,7 +26,16 @@ instructions.
 
 ```shell
 pip install -r requirements.txt
+pip install -r requirements_dev.txt
 uvicorn main:app --reload
 ```
 
+## Tests
 
+```shell
+cd tests && pytest
+```
+
+## License
+
+MIT (be aware, OCRmyPDF has its own licenses due to multiple dependencies)
