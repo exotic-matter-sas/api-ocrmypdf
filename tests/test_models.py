@@ -1,4 +1,4 @@
-from models import Document
+from api.models import Document
 
 
 class TestDocumentModel:
@@ -27,10 +27,10 @@ class TestDocumentModel:
 
     def test_ocr(self, monkeypatch, tmp_path, document_model, subprocess_check_output):
         import subprocess
-        import settings
+        import api.settings
 
         # Change current basedir so we can compute relative path later correctly
-        monkeypatch.setattr(settings.config, "basedir", tmp_path)
+        monkeypatch.setattr(api.settings.config, "basedir", tmp_path)
         output, param = subprocess_check_output
         monkeypatch.setattr(subprocess, "check_output", output)
 
@@ -45,15 +45,15 @@ class TestDocumentModel:
         output.assert_called_once_with(
             " ".join(
                 [
-                    settings.config.base_command_ocr,
-                    settings.config.base_command_option,
+                    api.settings.config.base_command_ocr,
+                    api.settings.config.base_command_option,
                     f"-l {'+'.join([l.value for l in document.lang])}",
-                    f"--sidecar {document.output_txt.resolve().relative_to(settings.config.basedir).as_posix()}",
+                    f"--sidecar {document.output_txt.resolve().relative_to(api.settings.config.basedir).as_posix()}",
                     document.input.resolve()
-                    .relative_to(settings.config.basedir)
+                    .relative_to(api.settings.config.basedir)
                     .as_posix(),
                     document.output.resolve()
-                    .relative_to(settings.config.basedir)
+                    .relative_to(api.settings.config.basedir)
                     .as_posix(),
                 ]
             ),

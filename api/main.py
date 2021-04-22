@@ -27,9 +27,9 @@ from fastapi.security import APIKeyHeader
 from pydantic import ValidationError
 from starlette.status import HTTP_403_FORBIDDEN
 
-from models import Document, Lang
-from settings import config
-from tools import save_upload_file
+from api.models import Document, Lang
+from api.settings import config
+from api.tools import save_upload_file
 
 logger = logging.getLogger("gunicorn.error")
 

@@ -2,9 +2,9 @@ import pytest
 from fastapi.testclient import TestClient
 from freezegun import freeze_time
 
-import main
-from main import app
-from models import Document
+import api.main
+from api.main import app
+from api.models import Document
 
 
 @pytest.fixture(scope="class")
@@ -14,7 +14,7 @@ def client():
 
 @pytest.fixture(scope="module")
 def document_upload():
-    post_files_param = {"file": open("test.pdf", "rb")}
+    post_files_param = {"file": open("tests/test.pdf", "rb")}
     return post_files_param
 
 
@@ -44,14 +44,14 @@ class TestMain:
         self, monkeypatch, client, document_model, test_input, expected
     ):
         document = document_model()
-        monkeypatch.setitem(main.documents, document.pid, document)
+        monkeypatch.setitem(api.main.documents, document.pid, document)
 
         response = client.get(f"/ocr/{document.pid}", headers={"X-API-KEY": test_input})
         assert response.status_code == expected
 
     def test_get_doc_detail(self, monkeypatch, document_model, client):
         document = document_model()
-        monkeypatch.setitem(main.documents, document.pid, document)
+        monkeypatch.setitem(api.main.documents, document.pid, document)
 
         response = client.get(f"/ocr/{document.pid}", headers={"X-API-KEY": "changeme"})
 
@@ -61,7 +61,7 @@ class TestMain:
 
     def test_get_doc_pdf(self, monkeypatch, document_model, client):
         document = document_model()
-        monkeypatch.setitem(main.documents, document.pid, document)
+        monkeypatch.setitem(api.main.documents, document.pid, document)
 
         response = client.get(
             f"/ocr/{document.pid}/pdf", headers={"X-API-KEY": "changeme"}
@@ -73,7 +73,7 @@ class TestMain:
 
     def test_get_doc_txt(self, monkeypatch, document_model, client):
         document = document_model()
-        monkeypatch.setitem(main.documents, document.pid, document)
+        monkeypatch.setitem(api.main.documents, document.pid, document)
 
         response = client.get(
             f"/ocr/{document.pid}/txt", headers={"X-API-KEY": "changeme"}
@@ -86,14 +86,14 @@ class TestMain:
     @freeze_time("2021-04-01 12:30:00")
     def test_ocr(self, monkeypatch, mocker, client, document_upload):
         from starlette.background import BackgroundTasks
-        from models import Document
+        from api.models import Document
         from datetime import datetime, timedelta
         import uuid
         from pathlib import Path
 
         # Mocks
         mock_add_task = mocker.patch.object(BackgroundTasks, "add_task")
-        mock_save_upload_file = mocker.patch.object(main, "save_upload_file")
+        mock_save_upload_file = mocker.patch.object(api.main, "save_upload_file")
         spy_uuid4 = mocker.spy(uuid, "uuid4")
 
         # Act
@@ -119,7 +119,7 @@ class TestMain:
 
         mock_add_task.assert_called_once()
         args, _ = mock_add_task.call_args
-        assert args[0] == main.do_ocr
+        assert args[0] == api.main.do_ocr
         assert isinstance(args[1], Document)
 
         json = response.json()

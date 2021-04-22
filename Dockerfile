@@ -33,14 +33,11 @@ WORKDIR /app
 
 RUN pip3 install ocrmypdf==11.7.3
 
-ADD requirements.txt /app/requirements.txt
+COPY requirements.txt /app/requirements.txt
 RUN pip3 install -r requirements.txt
 
-ADD main.py /app/main.py
-ADD models.py /app/models.py
-ADD settings.py /app/settings.py
-ADD tools.py /app/tools.py
+COPY api/ /app/api
 
 EXPOSE 8000
 
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "api.main:app", "--host", "0.0.0.0", "--port", "8000"]

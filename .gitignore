@@ -1,3 +1,4 @@
 .idea
-workdir
+workdir/
 *.pdf
+*.key

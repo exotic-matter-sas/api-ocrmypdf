@@ -7,7 +7,7 @@ from uuid import UUID
 
 from pydantic import BaseModel
 
-from settings import config
+from api.settings import config
 
 
 class Lang(str, Enum):
