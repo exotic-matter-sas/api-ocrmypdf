@@ -66,7 +66,7 @@ def clean_docs():
 
 def do_ocr(_doc: Document):
     pool_ocr.acquire()
-    _doc.ocr()
+    _doc.ocr(config.enable_wsl_compat)
     pool_ocr.release()
 
 

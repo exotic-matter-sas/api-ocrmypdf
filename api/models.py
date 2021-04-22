@@ -8,6 +8,7 @@ from uuid import UUID
 from pydantic import BaseModel
 
 from api.settings import config
+from api.tools import special_win_wslpath
 
 
 class Lang(str, Enum):
@@ -43,10 +44,23 @@ class Document(BaseModel):
     expire: datetime
     finished: Optional[datetime] = None
 
-    def ocr(self):
+    def ocr(self, wsl: bool = False):
         self.status = "processing"
         self.processing = datetime.now()
         self.save_state()
+
+        # Hack for user using OCRmyPDF inside WSL (Windows)
+        output_txt_path = (
+            special_win_wslpath(self.output_txt)
+            if wsl
+            else str(self.output_txt.absolute())
+        )
+        input_path = (
+            special_win_wslpath(self.input) if wsl else str(self.input.absolute())
+        )
+        output_path = (
+            special_win_wslpath(self.output) if wsl else str(self.output.absolute())
+        )
         try:
             output = subprocess.check_output(
                 " ".join(
@@ -54,9 +68,9 @@ class Document(BaseModel):
                         config.base_command_ocr,
                         config.base_command_option,
                         f"-l {'+'.join([l.value for l in self.lang])}",
-                        f"--sidecar {self.output_txt.resolve().relative_to(config.basedir).as_posix()}",
-                        self.input.resolve().relative_to(config.basedir).as_posix(),
-                        self.output.resolve().relative_to(config.basedir).as_posix(),
+                        f"--sidecar {output_txt_path}",
+                        input_path,
+                        output_path,
                     ]
                 ),
                 stderr=subprocess.STDOUT,

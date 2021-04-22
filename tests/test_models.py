@@ -48,13 +48,9 @@ class TestDocumentModel:
                     api.settings.config.base_command_ocr,
                     api.settings.config.base_command_option,
                     f"-l {'+'.join([l.value for l in document.lang])}",
-                    f"--sidecar {document.output_txt.resolve().relative_to(api.settings.config.basedir).as_posix()}",
-                    document.input.resolve()
-                    .relative_to(api.settings.config.basedir)
-                    .as_posix(),
-                    document.output.resolve()
-                    .relative_to(api.settings.config.basedir)
-                    .as_posix(),
+                    f"--sidecar {str(document.output_txt.absolute())}",
+                    str(document.input.absolute()),
+                    str(document.output.absolute()),
                 ]
             ),
             stderr=subprocess.STDOUT,
