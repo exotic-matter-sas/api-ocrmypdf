@@ -1,3 +1,4 @@
+import os
 import random
 import uuid
 from datetime import datetime, timedelta
@@ -6,6 +7,14 @@ from pathlib import Path
 import pytest
 
 from models import Document
+
+
+@pytest.fixture(scope="function", autouse=True)
+def change_test_dir(request):
+    os.chdir(request.fspath.dirname)
+    yield
+    os.chdir(request.config.invocation_dir)
+
 
 subprocess_case = [
     (0, "done", "Command line output test"),
