@@ -83,8 +83,14 @@ class TestMain:
         assert "Content-Type" in response.headers
         assert response.headers.get("Content-Type", None) == "text/plain; charset=utf-8"
 
+    @pytest.mark.parametrize(
+        "test_value,expected",
+        [("fra", 202), ("eng", 202), pytest.param("xxx", 400, marks=pytest.mark.xfail)],
+    )
     @freeze_time("2021-04-01 12:30:00")
-    def test_ocr(self, monkeypatch, mocker, client, document_upload):
+    def test_ocr(
+        self, monkeypatch, mocker, client, document_upload, test_value, expected
+    ):
         from starlette.background import BackgroundTasks
         from api.models import Document
         from datetime import datetime, timedelta
@@ -98,11 +104,13 @@ class TestMain:
 
         # Act
         response = client.post(
-            "/ocr", files=document_upload, headers={"X-API-KEY": "changeme"}
+            f"/ocr?lang={test_value}",
+            files=document_upload,
+            headers={"X-API-KEY": "changeme"},
         )
 
         # Assert
-        assert response.status_code == 202
+        assert response.status_code == expected
 
         mock_save_upload_file.assert_called_once()
         spy_uuid4.assert_called_once()
@@ -125,7 +133,7 @@ class TestMain:
         json = response.json()
         assert json == {
             "pid": str(spy_uuid4.spy_return),
-            "lang": ["eng"],
+            "lang": [test_value],
             "input": x_input.__str__(),
             "output": x_output_file.__str__(),
             "output_json": x_output_file_json.__str__(),

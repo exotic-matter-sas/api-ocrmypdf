@@ -6,7 +6,7 @@ import uuid
 from datetime import datetime, timedelta
 from pathlib import Path
 from threading import BoundedSemaphore
-from typing import Optional, List, Dict
+from typing import Optional, Dict, Set
 from uuid import UUID
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
@@ -159,7 +159,7 @@ def get_doc_txt(pid: UUID, api_key: APIKey = Depends(check_api_key)):
 )
 async def ocr(
     background_tasks: BackgroundTasks,
-    lang: Optional[List[str]] = Query([Lang.eng]),
+    lang: Optional[Set[str]] = Query([Lang.eng]),
     file: UploadFile = File(...),
     api_key: APIKey = Depends(check_api_key),
 ):

@@ -2,7 +2,7 @@ import subprocess
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Optional, List
+from typing import Optional, Set
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -31,7 +31,7 @@ class Lang(str, Enum):
 
 class Document(BaseModel):
     pid: UUID
-    lang: List[Lang]
+    lang: Set[Lang]
     status: str
     input: Path
     output: Path
