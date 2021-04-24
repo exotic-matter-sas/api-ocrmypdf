@@ -21,7 +21,8 @@ apply upper case to the name of the setting.
 
 ## Development
 
-Require `ocrmypdf` to be installed on your system. Refer to [OCRmyPDF docs](https://ocrmypdf.readthedocs.io) for
+ * Python 3.7+
+ * OCRmyPDF 12.+ Refer to [OCRmyPDF docs](https://ocrmypdf.readthedocs.io) for
 instructions.
 
 ```shell
